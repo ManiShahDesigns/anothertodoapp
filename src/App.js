@@ -1,26 +1,102 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import TodoInput from "./components/TodoInput";
+import TodoList from "./components/TodoList";
+import "bootstrap/dist/css/bootstrap.min.css";
+import uuid from "uuid";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  state = {
+    items: [],
+    id: uuid(),
+    item: "",
+    editItem: false
+  };
+
+  handleChange = (e) => {
+    this.setState({
+      item: e.target.value
+    });
+  };
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (this.state.item === "") {
+      return;
+    } else {
+      const newItem = {
+        id: this.state.id,
+        title: this.state.item
+      };
+
+      const updateItems = [...this.state.items, newItem];
+
+      this.setState({
+        items: updateItems,
+        item: "",
+        id: uuid(),
+        editItem: false,
+        inputError: false
+      });
+    }
+  };
+
+  clearList = () => {
+    this.setState({
+      items: []
+    });
+  };
+
+  handleDelete = (id) => {
+    const filteredItems = this.state.items.filter((item) => item.id !== id);
+
+    this.setState({
+      items: filteredItems
+    });
+  };
+
+  handleEdit = (id) => {
+    const filteredItems = this.state.items.filter((item) => item.id !== id);
+
+    console.log(filteredItems);
+
+    const selectedItem = this.state.items.find((item) => item.id === id);
+
+    console.log(selectedItem);
+
+    this.setState({
+      items: filteredItems,
+      item: selectedItem.title,
+      editItem: true,
+      id: id
+    });
+  };
+
+  render() {
+    return (
+      <div className="container">
+        <h2 className="text-center p-3 text-success">
+          Another Todo App
+        </h2>
+        <div className="row">
+          <div className="col-10 mx-auto col-md-8 mt-4">
+            <TodoInput
+              item={this.state.item}
+              handleChange={this.handleChange}
+              handleSubmit={this.handleSubmit}
+              editItem={this.state.editItem}
+            />
+            <TodoList
+              items={this.state.items}
+              clearList={this.clearList}
+              handleDelete={this.handleDelete}
+              handleEdit={this.handleEdit}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default App;
